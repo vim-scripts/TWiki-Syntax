@@ -1,0 +1,9 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=1113
+
+Syntaxfile for TWiki syntax (http://www.twiki.org)
+One can configure Mozilla to use an external editor for editing HTML-edit-fields. So when one uses vim, he gets his code highlighted.
+
+For configuring mozilla, go to http://mozex.mozdev.org
+
+Still isn't ready, so email feedback to me or, better, join the project on http://www.sourceforge.net/projects/vim-twiki
+
