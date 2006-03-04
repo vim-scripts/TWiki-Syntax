@@ -1,105 +1,142 @@
-" Vim syntax file
-" Language:     twiki
-" Maintainer:   Rainer Thierfelder
-" Last Change:  2004 Oct 25
-
-" Quit if syntax file is already loaded
-if version < 600
-	syntax clear
-elseif exists("b:current_syntax")
-	finish
-endif
-
-" Only do this when not done yet for this buffer
-if exists("b:did_ftplugin")
-	finish
-endif
-let b:did_ftplugin = 1
-
-" info for me : :help usr_44.txt 
-" --> infos for writing syntaxfiles
-
-syn match   twikiSeparator   "^---\+"
-syn match   twikiListItem   "^\(   \)\+\*\ze "
-" \ze in regexpr ends match, but following space must be there
-syn match   twikiOrderList  "^\(   \)\+1\ze "
-"syn match   twikiWord        "\([\.\-;,<>\*\?]\)\zs\<![A-Z]\w\+[A-Z]\w\+\>"
-syn match   twikiWord        "\(\s\|^\)\zs[A-Z][a-z0-9]\+\([A-Z][a-z0-9]\+\)\+\ze\(\>\|_\)"
-syn region  twikiLink        start=/\([ ]\)\zs\[\[/ end=/\]\]\ze\([,. ?):-]\|$\)/
-" TODO: doesn't work right until now
-
-"syn region  twikiTag	    start="%[^ ]" end="%"
-"syn region  twikiTag	    start="<[^ ]" end=">"
-syn match   twikiTag	    "%\(\w\)\+%"
-syn match   twikiTag	    "<\(\w\)\+>"
-" TODO: check, if tags are correct?
-" TODO: problems with nested tags
-
-syn region  twikiComment    start="<!--" end="-->"
-syn region  twikiVerbatim   start="<verbatim>" end="</verbatim>"
-
-syn region  twikiHead        start=/^---+\+/ end=/$/ oneline
-
-" emphasizing , from twiki-sourcecode:
-"# Emphasizing
-"            # PTh 25 Sep 2000: More relaxed rules, allow leading '(' and trailing ',.;:!?)'
-"            s/([\s\(])==([^\s]+?|[^\s].*?[^\s])==([\s\,\.\;\:\!\?\)])/$1 . &fixedFontText( $2, 1 ) . $3/ge;
-"            s/([\s\(])__([^\s]+?|[^\s].*?[^\s])__([\s\,\.\;\:\!\?\)])/$1<strong><em>$2<\/em><\/strong>$3/g;
-"            s/([\s\(])\*([^\s]+?|[^\s].*?[^\s])\*([\s\,\.\;\:\!\?\)])/$1<strong>$2<\/strong>$3/g;
-"            s/([\s\(])_([^\s]+?|[^\s].*?[^\s])_([\s\,\.\;\:\!\?\)])/$1<em>$2<\/em>$3/g;
-"            s/([\s\(])=([^\s]+?|[^\s].*?[^\s])=([\s\,\.\;\:\!\?\)])/$1 . &fixedFontText( $2, 0 ) . $3/ge;
+"============================================================================
 "
-syn region  twikiFixed	     start=/\(^\|[ ]\)\zs=/ end=/=\ze\([,. ?):-]\|$\)/
-syn region  twikiBoldFixed   start=/\(^\|[ ]\)\zs==/ end=/==\ze\([,. ?):-]\|$\)/
-syn region  twikiBold         start=/\(^\|[ ]\)\zs\*/ end=/\*\ze\([,. ?):-]\|$\)/
-" TODO: Wie laesst sich kontrollieren, dass noch ein * folgt?
-" will man wirklich nen * anzeigen, wird alles folgende als bold
-" interpretiert: z.B. 'vor dem *):' soll als einzelner * gewertet werden
-syn region  twikiItalic       start=/\(^\|[ ]\)\zs_/ end=/_\ze\([,. ?):-]\|$\)/
-syn region  twikiBoldItalic   start=/\(^\|[ ]\)\zs__/ end=/__\ze\([,. ?):-]\|$\)/
-
-" The default highlighting.
-if version >= 508 || !exists("did_twiki_syn_inits")
-  if version < 508
-    let did_twiki_syn_inits = 1
+" TWiki syntax file
+"
+" Language:    TWiki
+" Version:     $Id: twiki.vim,v 1.6 2006/03/03 08:44:25 rat Exp $
+" Maintainer:  Rainer Thierfelder <rainer{AT}rainers-welt{DOT}de>
+" Additions:   Eric Haarbauer <ehaar{DOT}com{AT}grithix{DOT}dyndns{DOT}org>
+" License:     GPL (http://www.gnu.org/licenses/gpl.txt)
+"    Copyright (C) 2004  Rainer Thierfelder
+"
+"    This program is free software; you can redistribute it and/or modify
+"    it under the terms of the GNU General Public License as published by
+"    the Free Software Foundation; either version 2 of the License, or
+"    (at your option) any later version.
+"
+"    This program is distributed in the hope that it will be useful,
+"    but WITHOUT ANY WARRANTY; without even the implied warranty of
+"    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+"    GNU General Public License for more details.
+"
+"    You should have received a copy of the GNU General Public License
+"    along with this program; if not, write to the Free Software
+"    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"
+"============================================================================
+"
+" For version 5.x: Clear all syntax items
+" For version 6.x: Quit when a syntax file was already loaded
+if !exists("main_syntax")
+  if version < 600
+    syntax clear
+  elseif exists("b:current_syntax")
+    finish
   endif
-  
-  hi def link twikiHead       Statement
-  hi def link twikiLink       Special
-  hi def link twikiTag	      Identifier
-  hi def link twikiComment    Comment
-  hi def link twikiWord       Keyword
-  hi def link twikiVerbatim   Type
-  hi def     twikiListItem    ctermfg=5
-  hi def     twikiOrderList   ctermfg=5
-  " TODO: this only works for vim in console, not in GUI
-  hi def     twikiFixed	      ctermfg=6
-  hi def     twikiBoldFixed   cterm=reverse ctermfg=6
-  hi def     twikiItalic      ctermfg=7
-  hi def     twikiBoldItalic  cterm=reverse ctermfg=7
-  hi def     twikiBold        cterm=reverse
+  let main_syntax = 'twiki'
 endif
 
-setlocal tabstop=8
-setlocal sw=3
-setlocal expandtab
-setlocal titlestring=TWiki-Edit"
-setlocal title
-setlocal smarttab
-setlocal autoindent
+" Don't use standard HiLink, it will not work with included syntax files
+if version < 508
+  command! -nargs=+ TwikiHiLink   highlight link <args>
+  command! -nargs=+ TwikiSynColor highlight <args>
+else
+  command! -nargs=+ TwikiHiLink   highlight default link <args>
+  command! -nargs=+ TwikiSynColor highlight default <args>
+endif
+
+"============================================================================
+" Group Definitions:    {{{1
+"============================================================================
+
+syntax match twikiSeparator    "^---\+"
+syntax match twikiBulletedList "^\(   \)\+\*\ze "
+syntax match twikiOrderedList  "^\(   \)\+1\ze "
+
+syntax match twikiVariable "\([^!]\|^\)\zs%\w\+%"
+syntax match twikiTag      "<\w\+>"
+
+syntax match twikiDelimiter "|"
+
+syntax region twikiComment  start="<!--" end="-->"
+syntax region twikiVerbatim matchgroup=twikiTag
+    \ start="<verbatim>" end="</verbatim>"
+
+syntax region twikiHeading matchgroup=twikiHeadingMarker oneline
+    \ start="^---+\+" end="$"
+
+let s:wikiWord = '\u[a-z0-9]\+\(\u[a-z0-9]\+\)\+'
+
+execute 'syntax match twikiAnchor +^#'.s:wikiWord.'\ze\(\>\|_\)+'
+execute 'syntax match twikiWord +\(\s\|^\)\zs\(\u\l\+\.\)\='.s:wikiWord.'\(#'.s:wikiWord.'\)\=\ze\(\>\|_\)+'
+" Regex guide:                   ^pre        ^web name       ^wikiword  ^anchor               ^ post
+
+" Links: {{{2
+syntax region twikiLink matchgroup=twikiLinkMarker
+    \ start="\( \|^\)\zs\[\[" end="\]\]\ze\([,. ?):-]\|$\)"
+    \ contains=twikiForcedLink,twikiLinkRef keepend
+
+execute 'syntax match twikiForcedLink +[ A-Za-z0-9]\+\(#'.s:wikiWord.'\)\=+ contained'
+
+syntax match twikiLinkRef    ".\{-}\ze\]\["
+    \ contained contains=twikiLinkMarker nextgroup=twikiLinkLabel
+syntax match twikiLinkLabel  ".\{-}\ze\]\]"   contained contains=twikiLinkMarker
+syntax match twikiLinkMarker "\]\["           contained
+
+" Emphasis:  {{{2
+function! s:TwikiCreateEmphasis(token, name)
+    execute 'syntax region twiki'.a:name.
+           \' oneline start=+\(^\|[ ]\)\zs'.a:token.
+           \'+ end=+'.a:token.'\ze\([,. ?):-]\|$\)+'
+endfunction
+
+call s:TwikiCreateEmphasis('=',  'Fixed')
+call s:TwikiCreateEmphasis('==', 'BoldFixed')
+call s:TwikiCreateEmphasis('\*', 'Bold')
+call s:TwikiCreateEmphasis('_',  'Italic')
+call s:TwikiCreateEmphasis('__', 'BoldItalic')
+
+"============================================================================
+" Group Linking:    {{{1
+"============================================================================
+
+TwikiHiLink twikiHeading       String
+TwikiHiLink twikiHeadingMarker Operator
+TwikiHiLink twikiVariable      PreProc
+TwikiHiLink twikiTag           PreProc
+TwikiHiLink twikiComment       Comment
+TwikiHiLink twikiWord          Tag
+TwikiHiLink twikiAnchor        PreProc
+TwikiHiLink twikiVerbatim      Constant
+TwikiHiLink twikiBulletedList  Operator
+TwikiHiLink twikiOrderedList   Operator
+
+TwikiHiLink twikiDelimiter     Operator
+
+" Links
+TwikiSynColor twikiLinkMarker term=bold cterm=bold gui=bold
+TwikiHiLink   twikiForcedLink Tag
+TwikiHiLink   twikiLinkRef    Tag
+TwikiHiLink   twikiLinkLabel  Identifier
+
+" Emphasis
+TwikiSynColor twikiFixed      term=underline cterm=underline gui=underline
+TwikiSynColor twikiBoldFixed  term=bold,underline cterm=bold,underline gui=bold,underline
+TwikiSynColor twikiItalic     term=italic cterm=italic gui=italic
+TwikiSynColor twikiBoldItalic term=bold,italic cterm=bold,italic gui=bold,italic
+TwikiSynColor twikiBold       term=bold cterm=bold gui=bold
+
+"============================================================================
+" Clean Up:    {{{1
+"============================================================================
+
+delcommand TwikiHiLink
+delcommand TwikiSynColor
+
+if main_syntax == 'twiki'
+  unlet main_syntax
+endif
 
 let b:current_syntax = "twiki"
 
-" if one doesn't want this keymappings, set to 0
-let SetOwnMaps = 1
-if ( SetOwnMaps == 1 )
-  " keymapping for twiki:
-  imap  <CR><verbatim><CR></verbatim><CR><ESC>kO
-elseif SetOwnMaps == 0
-  " do nothing
-else
-  " SetOwnMaps should be 1 or 0 and nothing else!
-endif
-
-
-"EOF vim: tw=78:ft=vim:ts=8
+" vim:fdm=marker
